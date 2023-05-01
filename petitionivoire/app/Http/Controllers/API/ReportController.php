@@ -3,47 +3,37 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Models\Comment;
+use App\Models\Report;
 use Illuminate\Http\Request;
 
 class ReportController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    public function __construct()
+    {
+        $this->middleware('auth:sanctum')->only(['store']);
+        $this->middleware('role:admin')->only(['index']);
+    }
+
     public function index()
     {
-        //
+        $reports = Report::with('comment', 'user')->get();
+        return response()->json($reports, 200);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function store(Request $request, Comment $comment)
     {
-        //
-    }
+        $request->validate([
+            'reason' => 'required|max:255',
+        ]);
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
+        $report = new Report([
+            'user_id' => auth()->id(),
+            'comment_id' => $comment->id,
+            'reason' => $request->reason,
+        ]);
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        $report->save();
+        return response()->json($report, 201);
     }
 }

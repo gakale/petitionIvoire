@@ -9,13 +9,20 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up(): void
+    public function up() : void
     {
         Schema::create('signatures', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('user_id');
+            $table->unsignedBigInteger('petition_id');
             $table->timestamps();
+
+            $table->unique(['user_id', 'petition_id']);
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('petition_id')->references('id')->on('petitions')->onDelete('cascade');
         });
     }
+
 
     /**
      * Reverse the migrations.
