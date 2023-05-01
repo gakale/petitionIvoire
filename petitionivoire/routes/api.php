@@ -71,3 +71,11 @@ Route::middleware(['auth:sanctum'])->group(function () {
 Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
     Route::get('reports', [ReportController::class, 'index']);
 });
+
+Route::middleware('auth:api')->group(function () {
+    Route::apiResource('categories', CategoryController::class);
+    Route::apiResource('petitions', PetitionController::class);
+    Route::apiResource('petitions.comments', CommentController::class)->shallow();
+    Route::apiResource('petitions.signatures', SignatureController::class)->shallow();
+    Route::apiResource('comments.reports', ReportController::class)->shallow();
+});
