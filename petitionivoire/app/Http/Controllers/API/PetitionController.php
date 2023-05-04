@@ -5,89 +5,106 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Models\Petition;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use App\Models\Signature;
 
 class PetitionController extends Controller
 {
-    public function __construct()
-    {
-        // Middleware pour s'assurer que seuls les utilisateurs authentifiés peuvent créer, mettre à jour et supprimer des pétitions
-        $this->middleware('auth:sanctum')->except(['index', 'show']);
-    }
-
     public function index()
     {
-        $petitions = Petition::where('status', 'accepted')->get(); // Ne montrer que les pétitions acceptées
-        return response()->json($petitions, 200);
+        $petitions = Petition::with('category')->get();
+        return response()->json($petitions);
+    }
+
+    public function show(Petition $petition)
+    {
+        $petition->load('category');
+        return response()->json($petition);
     }
 
     public function store(Request $request)
     {
-        $request->validate([
-            'title' => 'required|max:255',
-            'description' => 'required',
-            'category_id' => 'required|exists:categories,id',
-            'signature_goal' => 'required|integer|min:1',
-            'image_url' => 'nullable|url',
+        $validatedData = $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'required|string',
+            'goal' => 'required|integer|min:1',
+            'category_id' => 'required|integer|exists:categories,id',
+            'image' => 'nullable|image',
         ]);
 
-        $petition = new Petition([
-            'title' => $request->title,
-            'description' => $request->description,
-            'category_id' => $request->category_id,
-            'signature_goal' => $request->signature_goal,
-            'image_url' => $request->image_url,
-            'user_id' => Auth::id(),
-        ]);
-
+        $petition = new Petition($validatedData);
+        $petition->user_id = $request->user()->id;
         $petition->save();
 
         return response()->json($petition, 201);
     }
 
-    public function show(Petition $petition)
-    {
-        if ($petition->status != 'accepted') {
-            return response()->json(['error' => 'Petition not found'], 404);
-        }
-
-        return response()->json($petition, 200);
-    }
-
     public function update(Request $request, Petition $petition)
     {
-        // Vérifier si l'utilisateur est l'auteur de la pétition et si la pétition n'a pas encore été validée
-        if ($petition->user_id != Auth::id() || $petition->status != 'pending') {
-            return response()->json(['error' => 'Unauthorized'], 403);
-        }
+        $this->authorize('update', $petition);
 
-        $request->validate([
-            'title' => 'required|max:255',
-            'description' => 'required',
-            'category_id' => 'required|exists:categories,id',
-            'signature_goal' => 'required|integer|min:1',
-            'image_url' => 'nullable|url',
+        $validatedData = $request->validate([
+            'title' => 'sometimes|required|string|max:255',
+            'description' => 'sometimes|required|string',
+            'goal' => 'sometimes|required|integer|min:1',
+            'category_id' => 'sometimes|required|integer|exists:categories,id',
+            'image' => 'nullable|image',
         ]);
 
-        $petition->update([
-            'title' => $request->title,
-            'description' => $request->description,
-            'category_id' => $request->category_id,
-            'signature_goal' => $request->signature_goal,
-            'image_url' => $request->image_url,
-        ]);
+        $petition->update($validatedData);
 
-        return response()->json($petition, 200);
+        return response()->json($petition);
     }
 
     public function destroy(Petition $petition)
     {
-        // Vérifier si l'utilisateur est l'auteur de la pétition et si la pétition n'a pas encore été validée
-        if ($petition->user_id != Auth::id() || $petition->status != 'pending') {
-            return response()->json(['error' => 'Unauthorized'], 403);
-        }
-
+        $this->authorize('delete', $petition);
         $petition->delete();
-        return response()->json(['message' => 'Petition deleted'], 200);
+
+        return response()->json(['message' => 'Petition deleted successfully'], 200);
     }
+
+    public function sign(Request $request, Petition $petition)
+    {
+        $user = $request->user();
+
+        $signature = Signature::firstOrCreate([
+            'user_id' => $user->id,
+            'petition_id' => $petition->id,
+        ]);
+
+        $petition->increment('signatures');
+        $petition->save();
+
+        return response()->json(['message' => 'Petition signed successfully'], 200);
+    }
+
+    public function getPetitionsByCategory(Request $request, int $category_id)
+    {
+        $petitions = Petition::where('category_id', $category_id)->with('category')->get();
+        return response()->json($petitions);
+    }
+
+
+    public function reachedGoals()
+    {
+        $petitions = Petition::whereColumn('signatures', '>=', 'goal')->get();
+        return response()->json($petitions);
+    }
+
+    public function userPetitions(Request $request)
+    {
+        $user = $request->user();
+        $petitions = $user->petitions;
+        return response()->json($petitions);
+    }
+
+    public function userUnapprovedPetitions(Request $request)
+    {
+        $user = $request->user();
+        $petitions = $user->petitions()->where('status', '!=', 'approved')->get();
+        return response()->json($petitions);
+    }
+
+
 }
+

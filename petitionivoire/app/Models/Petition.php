@@ -23,14 +23,16 @@ class Petition extends Model
         return $this->belongsTo(Category::class);
     }
 
-    public function signatures()
-    {
-        return $this->hasMany(Signature::class);
-    }
 
     public function comments()
     {
         return $this->hasMany(Comment::class);
     }
+
+    public function likes()
+    {
+        return $this->morphMany(Like::class, 'likeable');
+    }
+
 
 }

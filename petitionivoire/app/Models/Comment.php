@@ -27,4 +27,10 @@ class Comment extends Model
         return $this->hasMany(Report::class);
     }
 
+    public function likes()
+    {
+        return $this->morphMany(Like::class, 'likeable');
+    }
+
+
 }

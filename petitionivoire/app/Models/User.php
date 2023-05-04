@@ -50,11 +50,6 @@ class User extends Authenticatable
         return $this->hasMany(Petition::class);
     }
 
-    public function signatures()
-    {
-        return $this->hasMany(Signature::class);
-    }
-
     public function comments()
     {
         return $this->hasMany(Comment::class);
@@ -64,5 +59,11 @@ class User extends Authenticatable
     {
         return $this->hasMany(Report::class);
     }
+
+    public function likes()
+    {
+        return $this->hasMany(Like::class);
+    }
+
 
 }

@@ -3,31 +3,78 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
-use App\Models\Petition;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use App\Models\Like;
+use App\Models\Petition;
+use App\Models\Comment;
 
 class LikeController extends Controller
 {
-    public function __construct()
+    public function store(Request $request, $type, $id)
     {
-        $this->middleware('auth:sanctum');
+        $likeable = $this->getLikeable($type, $id);
+
+        if (!$likeable) {
+            return response()->json(['error' => 'Invalid type or ID'], 404);
+        }
+
+        $existingLike = $likeable->likes()->where('user_id', $request->user()->id)->first();
+
+        if ($existingLike) {
+            return response()->json(['message' => 'Already liked'], 200);
+        }
+
+        $like = new Like(['user_id' => $request->user()->id]);
+        $likeable->likes()->save($like);
+
+        return response()->json(['message' => 'Like added'], 201);
     }
 
-    public function store(Request $request, Petition $petition)
+    public function destroy(Request $request, $type, $id)
     {
-        Auth::user()->likes()->syncWithoutDetaching([$petition->id]);
-        return response()->json(['message' => 'Petition liked'], 200);
+        $likeable = $this->getLikeable($type, $id);
+
+        if (!$likeable) {
+            return response()->json(['error' => 'Invalid type or ID'], 404);
+        }
+
+        $existingLike = $likeable->likes()->where('user_id', $request->user()->id)->first();
+
+        if (!$existingLike) {
+            return response()->json(['message' => 'Like not found'], 404);
+        }
+
+        $existingLike->delete();
+
+        return response()->json(['message' => 'Like removed'], 200);
     }
 
-    public function destroy(Petition $petition)
+    public function index(Request $request, $type, $id)
     {
-        Auth::user()->likes()->detach($petition->id);
-        return response()->json(['message' => 'Petition unliked'], 200);
+        $likeable = $this->getLikeable($type, $id);
+
+        if (!$likeable) {
+            return response()->json(['error' => 'Invalid type or ID'], 404);
+        }
+
+        $likes = $likeable->likes;
+
+        return response()->json($likes);
     }
 
-    public function index(Petition $petition)
+    private function getLikeable($type, $id)
     {
-        return response()->json($petition->likes, 200);
+        $likeable = null;
+
+        switch ($type) {
+            case 'petitions':
+                $likeable = Petition::find($id);
+                break;
+            case 'comments':
+                $likeable = Comment::find($id);
+                break;
+        }
+
+        return $likeable;
     }
 }

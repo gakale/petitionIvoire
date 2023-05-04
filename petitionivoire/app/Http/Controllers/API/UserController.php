@@ -31,7 +31,8 @@ class UserController extends Controller
             'email' => $validatedData['email'],
             'password' => Hash::make($validatedData['password']),
         ]);
-
+        // Envoyer une notification par e-mail
+        $this->registered($user);
         return response()->json($user, 201);
     }
 
@@ -70,7 +71,13 @@ class UserController extends Controller
     public function userPetitions(Request $request, User $user)
     {
         // Récupérer les pétitions de l'utilisateur
-        $petitions = $user->petitions;
-        return response()->json($petitions);
+        $approvedPetitions = $user->petitions()->where('approved', true)->get();
+        $unapprovedPetitions = $user->petitions()->where('approved', false)->get();
+
+        return response()->json([
+            'approved_petitions' => $approvedPetitions,
+            'unapproved_petitions' => $unapprovedPetitions,
+        ]);
     }
+
 }

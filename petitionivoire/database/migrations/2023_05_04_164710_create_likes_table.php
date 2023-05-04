@@ -4,31 +4,30 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
+class CreateLikesTable extends Migration
 {
     /**
      * Run the migrations.
      */
-    public function up() : void
+    public function up()
     {
-        Schema::create('signatures', function (Blueprint $table) {
+        Schema::create('likes', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id');
-            $table->unsignedBigInteger('petition_id');
+            $table->unsignedBigInteger('likeable_id');
+            $table->string('likeable_type');
             $table->timestamps();
 
-            $table->unique(['user_id', 'petition_id']);
+            $table->unique(['user_id', 'likeable_id', 'likeable_type']);
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-            $table->foreign('petition_id')->references('id')->on('petitions')->onDelete('cascade');
         });
     }
-
 
     /**
      * Reverse the migrations.
      */
-    public function down(): void
+    public function down()
     {
-        Schema::dropIfExists('signatures');
+        Schema::dropIfExists('likes');
     }
-};
+}
