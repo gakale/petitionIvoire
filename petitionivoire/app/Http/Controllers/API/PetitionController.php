@@ -67,15 +67,25 @@ class PetitionController extends Controller
     {
         $user = $request->user();
 
-        $signature = Signature::firstOrCreate([
-            'user_id' => $user->id,
-            'petition_id' => $petition->id,
-        ]);
+        // Vérifie si l'utilisateur a déjà signé la pétition
+        $hasSigned = $petition->signatures()->where('user_id', $user->id)->exists();
+        if ($hasSigned) {
+            return response()->json(['message' => 'You have already signed this petition'], 400);
+        }
 
-        $petition->increment('signatures');
-        $petition->save();
+        // Ajoute la signature de l'utilisateur à la pétition
+        $petition->signatures()->create(['user_id' => $user->id]);
 
-        return response()->json(['message' => 'Petition signed successfully'], 200);
+        // Met à jour le nombre de signatures de la pétition
+        $petition->increment('signatures_count');
+
+        // Vérifie si l'objectif de la pétition a été atteint
+        if ($petition->goal && $petition->signatures_count >= $petition->goal) {
+            // Modifiez le statut de la pétition pour indiquer que l'objectif a été atteint
+            $petition->update(['status' => 'goal_reached']);
+        }
+
+        return response()->json(['message' => 'Thank you for signing the petition']);
     }
 
     public function getPetitionsByCategory(Request $request, int $category_id)

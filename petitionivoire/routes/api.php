@@ -5,7 +5,6 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\CategoryController;
 use App\Http\Controllers\API\PetitionController;
 use App\Http\Controllers\API\CommentController;
-use App\Http\Controllers\API\SignatureController;
 use App\Http\Controllers\API\ReportController;
 use App\Http\Controllers\API\UserController;
 use App\Http\Controllers\API\LikeController;

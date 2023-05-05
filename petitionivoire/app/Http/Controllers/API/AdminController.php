@@ -80,13 +80,21 @@ class AdminController extends Controller
 
     public function reportedComments()
     {
-        $reportedComments = Comment::where('is_reported', true)->get();
-        return response()->json($reportedComments);
+        $reports = Report::with('comment', 'user')->get();
+        return response()->json($reports);
     }
 
-    public function resolveReportedComment(Comment $comment)
+    public function resolveReportedComment(Request $request, Comment $comment)
     {
-        $comment->update(['is_reported' => false]);
-        return response()->json(['message' => 'Reported comment resolved successfully']);
+        $deleteComment = $request->input('delete', false);
+
+        if ($deleteComment) {
+            $comment->delete();
+        }
+
+        $reports = Report::where('comment_id', $comment->id)->update(['resolved' => true]);
+
+        return response()->json(['message' => 'Report resolved successfully']);
     }
+
 }
