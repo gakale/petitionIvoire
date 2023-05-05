@@ -1,66 +1,70 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Projet "Ma Côte d'Ivoire"
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## Description
 
-## About Laravel
+"Ma Côte d'Ivoire" est une application permettant aux citoyens de partager et soutenir des pétitions, des sujets et des discussions concernant divers problèmes et initiatives en Côte d'Ivoire. L'application se compose d'une API RESTful côté back-end et d'une interface utilisateur côté front-end.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Fonctionnalités
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- Authentification des utilisateurs
+- Gestion des pétitions (création, modification, suppression, signatures)
+- Gestion des sujets (création, modification, suppression)
+- Gestion des commentaires (création, modification, suppression)
+- Gestion des catégories (création, modification, suppression)
+- Système de likes pour les pétitions et les sujets
+- Signalement des commentaires
+- Fonctionnalités administrateur (approbation/rejet des pétitions et des sujets, gestion des signalements de commentaires)
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## API Endpoints
 
-## Learning Laravel
+L'API fournit plusieurs points de terminaison pour interagir avec les différentes ressources de l'application. Voici quelques-uns des points de terminaison les plus importants que le développeur front-end doit utiliser pour créer l'interface utilisateur :
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+- `/login` : pour l'authentification des utilisateurs
+- `/petitions` : pour récupérer, créer, modifier et supprimer des pétitions
+- `/petitions/{petition}/sign` : pour signer une pétition
+- `/categories` : pour récupérer, créer, modifier et supprimer des catégories
+- `/topics` : pour récupérer, créer, modifier et supprimer des sujets
+- `/comments` : pour récupérer, créer, modifier et supprimer des commentaires
+- `/reports` : pour signaler des commentaires
+- `/likes` : pour gérer les likes sur les pétitions et les sujets
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+Pour plus de détails sur les points de terminaison et les paramètres requis, veuillez consulter le fichier `routes/api.php` du back-end.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 2000 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Technologies utilisées
 
-## Laravel Sponsors
+- Back-end : Laravel (PHP)
+- Front-end : (À déterminer par le développeur front-end)
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+## Développement local
 
-### Premium Partners
+larvel 8.0 et php 7.4 sont requis pour le développement local. Pour installer le projet en local, veuillez suivre les étapes suivantes :
+- Cloner le dépôt
+- Installer les dépendances avec la commande `composer install`
+- Créer un fichier `.env` à partir du fichier `.env.example` et configurer les paramètres de base de données
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
-- **[WebReinvent](https://webreinvent.com/?utm_source=laravel&utm_medium=github&utm_campaign=patreon-sponsors)**
-- **[Lendio](https://lendio.com)**
+## Déploiement
 
-## Contributing
+(Expliquez ici comment déployer le projet en production. Vous pouvez mentionner les étapes de déploiement, les services utilisés pour le déploiement, etc.)
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+## Contribution
 
-## Code of Conduct
+Pour contribuer au projet, veuillez suivre les étapes suivantes :
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+1. Forkez le dépôt
+2. Créez une nouvelle branche avec un nom descriptif de la fonctionnalité ou du correctif que vous souhaitez apporter
+3. Effectuez vos modifications dans la branche nouvellement créée
+4. Soumettez une demande de fusion (Pull Request) avec une description détaillée de vos modifications
 
-## Security Vulnerabilities
+## Auteurs
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+- Développeur back-end : (gnakale prime)
+- Développeur front-end : (Nom du développeur front-end)
 
-## License
+## Licence
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Ce projet est sous
+licence (indiquez le type de licence utilisée, par exemple, MIT, GPL, etc.).
+
+Remerciements
+
+Nous tenons à remercier tous les contributeurs, les testeurs et les utilisateurs pour leur soutien et leurs commentaires tout au long du développement de l'application "Ma Côte d'Ivoire".

@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Like;
 use App\Models\Petition;
 use App\Models\Comment;
+use App\Models\Topic;
 
 class LikeController extends Controller
 {
@@ -72,6 +73,9 @@ class LikeController extends Controller
                 break;
             case 'comments':
                 $likeable = Comment::find($id);
+                break;
+            case 'topics':
+                $likeable = Topic::find($id);
                 break;
         }
 

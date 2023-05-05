@@ -10,6 +10,7 @@ use App\Http\Controllers\API\UserController;
 use App\Http\Controllers\API\LikeController;
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\AdminController;
+use App\Http\Controllers\API\TopicController;
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
@@ -58,3 +59,42 @@ Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
     Route::post('admin/reported-comments/{comment}/resolve', [AdminController::class, 'resolveReportedComment']);
 });
 
+// Routes pour les sujets (topics)
+Route::get('topics', [TopicController::class, 'index']);
+Route::get('topics/popular', [TopicController::class, 'popularTopics']);
+Route::get('topics/{topic}', [TopicController::class, 'show']);
+
+Route::middleware(['auth:sanctum'])->group(function () {
+    Route::post('topics', [TopicController::class, 'store']);
+    Route::put('topics/{topic}', [TopicController::class, 'update']);
+    Route::delete('topics/{topic}', [TopicController::class, 'destroy']);
+});
+
+// Routes pour les likes des sujets (topics)
+Route::middleware(['auth:sanctum'])->group(function () {
+    Route::post('topics/{topic}/like', [LikeController::class, 'storeTopicLike']);
+    Route::delete('topics/{topic}/unlike', [LikeController::class, 'destroyTopicLike']);
+    Route::get('topics/{topic}/likes', [LikeController::class, 'topicLikes']);
+});
+
+// Routes pour les commentaires des sujets (topics)
+Route::get('topics/{topic}/comments', [CommentController::class, 'index']);
+Route::middleware(['auth:sanctum'])->group(function () {
+    Route::post('topics/{topic}/comments', [CommentController::class, 'store']);
+    Route::put('comments/{comment}', [CommentController::class, 'update']);
+    Route::delete('comments/{comment}', [CommentController::class, 'destroy']);
+});
+
+// Routes pour les signalements de commentaires
+Route::middleware(['auth:sanctum'])->group(function () {
+    Route::post('comments/{comment}/report', [ReportController::class, 'store']);
+});
+
+// Routes pour les fonctionnalités administrateur
+Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
+    Route::get('admin/topics', [AdminController::class, 'topics']);
+    Route::post('admin/topics/{topic}/approve', [AdminController::class, 'approveTopic']);
+    Route::post('admin/topics/{topic}/reject', [AdminController::class, 'rejectTopic']);
+    Route::get('admin/reported-comments', [AdminController::class, 'reportedComments']);
+    Route::post('admin/reported-comments/{comment}/resolve', [AdminController::class, 'resolveReportedComment']);
+});

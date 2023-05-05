@@ -8,6 +8,8 @@ use Illuminate\Http\Request;
 use App\Models\Category;
 use App\Models\User;
 use App\Models\Comment;
+use App\Models\Topic;
+
 class AdminController extends Controller
 {
     public function __construct()
@@ -95,6 +97,24 @@ class AdminController extends Controller
         $reports = Report::where('comment_id', $comment->id)->update(['resolved' => true]);
 
         return response()->json(['message' => 'Report resolved successfully']);
+    }
+
+    public function reportedTopics()
+    {
+        $reportedTopics = Report::with('topic')->where('reportable_type', Topic::class)->get();
+        return response()->json($reportedTopics);
+    }
+
+    public function deleteComment(Request $request, Comment $comment)
+    {
+        $comment->delete();
+        return response()->json(['message' => 'Comment deleted successfully']);
+    }
+
+    public function deleteTopic(Request $request, Topic $topic)
+    {
+        $topic->delete();
+        return response()->json(['message' => 'Topic deleted successfully']);
     }
 
 }

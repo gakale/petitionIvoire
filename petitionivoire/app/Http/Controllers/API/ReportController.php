@@ -36,4 +36,10 @@ class ReportController extends Controller
         $report->save();
         return response()->json($report, 201);
     }
+
+    public function resolve(Comment $comment)
+    {
+        $comment->reports()->delete();
+        return response()->json(['message' => 'Reports resolved'], 200);
+    }
 }

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Models\Comment;
 use App\Models\Petition;
+use App\Models\Topic;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -15,13 +16,25 @@ class CommentController extends Controller
         $this->middleware('auth:sanctum')->except(['index']);
     }
 
-    public function index(Petition $petition)
+    public function index($type, $id)
     {
-        return response()->json($petition->comments, 200);
+        $commentable = $this->getCommentable($type, $id);
+
+        if (!$commentable) {
+            return response()->json(['error' => 'Invalid type or ID'], 404);
+        }
+
+        return response()->json($commentable->comments, 200);
     }
 
-    public function store(Request $request, Petition $petition)
+    public function store(Request $request, $type, $id)
     {
+        $commentable = $this->getCommentable($type, $id);
+
+        if (!$commentable) {
+            return response()->json(['error' => 'Invalid type or ID'], 404);
+        }
+
         $request->validate([
             'body' => 'required|max:500',
         ]);
@@ -29,10 +42,10 @@ class CommentController extends Controller
         $comment = new Comment([
             'body' => $request->body,
             'user_id' => Auth::id(),
-            'petition_id' => $petition->id,
         ]);
 
-        $comment->save();
+        $commentable->comments()->save($comment);
+
         return response()->json($comment, 201);
     }
 
@@ -41,7 +54,6 @@ class CommentController extends Controller
         if ($comment->user_id != Auth::id()) {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
-
 
         $request->validate([
             'body' => 'required|max:500',
@@ -62,5 +74,21 @@ class CommentController extends Controller
 
         $comment->delete();
         return response()->json(['message' => 'Comment deleted'], 200);
+    }
+
+    private function getCommentable($type, $id)
+    {
+        $commentable = null;
+
+        switch ($type) {
+            case 'petitions':
+                $commentable = Petition::find($id);
+                break;
+            case 'topics':
+                $commentable = Topic::find($id);
+                break;
+        }
+
+        return $commentable;
     }
 }
